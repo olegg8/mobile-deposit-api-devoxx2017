@@ -33,8 +33,34 @@ stage ('Build') {
     }
 
     // Let's stash various files, mandatory of the pipeline
-    //stash name: 'pom', includes: 'pom.xml'
-    //stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
-    //stash name: 'deployment.yml', includes:'deployment.yml'
+    stash name: 'pom', includes: 'pom.xml'
+    stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
+    stash name: 'deployment.yml', includes:'deployment.yml'
+  }
+}
+
+def dockerTag = "${env.BUILD_NUMBER}-${short_commit}"
+
+stage('Version Release') {
+
+  node {
+
+    // Extract the version number from the pom.xml file
+    unstash 'pom'
+    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+    if (matcher) {
+        buildVersion = matcher[0][1]
+        echo "Release version: ${buildVersion}"
+    }
+    matcher = null
+
+    def mobileDepositApiImage
+    stage('Build Docker Image') {
+      //unstash Spring Boot JAR and Dockerfile
+      dir('target') {
+        unstash 'jar-dockerfile'
+        mobileDepositApiImage = docker.build "mobile-deposit-api:${dockerTag}"
+      }
+    }
   }
 }
