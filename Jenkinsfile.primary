@@ -29,7 +29,7 @@ stage ('Build') {
 
     // Let's build the application inside a Docker container
     docker.image('kmadel/maven:3.3.3-jdk-8').inside('-v /data:/data') {
-        sh "mvn -Dmaven.repo.local=/data/mvn/repo -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
+        sh "mvn -Dmaven.repo.local=/usr/share/mvn/repo -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
     }
 
     // Tell Jenkins to archive the results of the Unit tests
@@ -59,7 +59,7 @@ stage('Version Release') {
         echo "Release version: ${buildVersion}"
     }
     matcher = null
-    
+
     def mobileDepositApiImage
     stage('Build Docker Image') {
       //unstash Spring Boot JAR and Dockerfile
@@ -68,15 +68,15 @@ stage('Version Release') {
         mobileDepositApiImage = docker.build "${DOCKER_REGISTRY}/mobile-deposit-api:${dockerTag}"
       }
     }
-      
+
     stage('Publish Docker Image') {
-      withDockerRegistry([url: "https://${DOCKER_REGISTRY}/v2", credentialsId: 'test-registry']) { 
+      withDockerRegistry([url: "https://${DOCKER_REGISTRY}/v2", credentialsId: 'test-registry']) {
         mobileDepositApiImage.push()
       }
     }
   }
 }
-    
+
 //set checkpoint before deployment
 checkpoint 'Build Complete'
 
@@ -91,7 +91,7 @@ stage('Deploy to Prod') {
         // Execute this sh script
         sh """
           az login --service-principal -u ${env.k8s_username} -p ${env.k8s_password} --tenant ${env.k8s_tenant}
-          
+
           # Install the Kubenetes secret key
           mkdir -p ~/.ssh
           (cat ${KUBERNETES_SECRET_KEY}; echo '\n') > ~/.ssh/id_rsa
@@ -101,7 +101,7 @@ stage('Deploy to Prod') {
 
           # Check if the Kubernetes credentials have been correctly installed
           kubectl version
-          
+
           # Update the deployment.yml with the latest versions of the app
           sed -i 's/REGISTRY_NAME/${env.DOCKER_REGISTRY}/g' ./deployment.yml
           sed -i 's/IMAGE_TAG/${dockerTag}/g' ./deployment.yml
@@ -111,11 +111,11 @@ stage('Deploy to Prod') {
 
           # Display the installed services (may also display the external IP if the service has been exposed)
           kubectl get services
-          
+
           """
           //send commit status to GitHub
           step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'BetterThanOrEqualBuildResult', message: 'Pipeline completed successfully', result: 'SUCCESS', state: 'SUCCESS']]]])
-          
+
           currentBuild.result = "success"
     }
   }
