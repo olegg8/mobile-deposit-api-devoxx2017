@@ -29,7 +29,7 @@ stage ('Build') {
 
     // Let's build the application inside a Docker container
     docker.image('kmadel/maven:3.3.3-jdk-8').inside('-v /data:/data') {
-        sh "mvn -Dmaven.repo.local=${user.home}/mvn/repo -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
+        sh "mvn -Dmaven.repo.local=/data/mvn/repo -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
     }
 
     // Let's stash various files, mandatory of the pipeline
