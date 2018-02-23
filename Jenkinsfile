@@ -15,10 +15,20 @@ def short_commit = null
 echo "Building ${env.BRANCH_NAME}"
 
 
+podTemplate(label: 'mypod', containers: [
+    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
+    containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm:latest', command: 'cat', ttyEnabled: true)
+  ],
+  volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+  ])
+
+
 stage ('Build') {
 
   // Asking for an agent with label 'docker-cloud'
-  node {
+  node('mypod') {
 
     checkout scm
 
@@ -43,7 +53,7 @@ def dockerTag = "${env.BUILD_NUMBER}-${short_commit}"
 
 stage('Version Release') {
 
-  node {
+  node('mypod') {
 
     // Extract the version number from the pom.xml file
     unstash 'pom'
