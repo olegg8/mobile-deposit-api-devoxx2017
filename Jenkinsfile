@@ -22,14 +22,11 @@ podTemplate(label: 'mypod', containers: [
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-  ])
-
-
-stage ('Build') {
-
+  ]) {
   // Asking for an agent with label 'docker-cloud'
   node('mypod') {
-
+    stage ('Build') {
+      container('docker'){
     checkout scm
 
     // Let's retrieve the SHA-1 on the last commit (to identify the version we build)
@@ -53,7 +50,7 @@ def dockerTag = "${env.BUILD_NUMBER}-${short_commit}"
 
 stage('Version Release') {
 
-  node('mypod') {
+  container('docker'){
 
     // Extract the version number from the pom.xml file
     unstash 'pom'
@@ -73,4 +70,6 @@ stage('Version Release') {
       }
     }
   }
+}
+}
 }
