@@ -20,7 +20,6 @@ podTemplate(label: 'mypod', containers: [
     containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
     //containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     //containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
-    //containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm:latest', command: 'cat', ttyEnabled: true)
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
@@ -36,7 +35,7 @@ podTemplate(label: 'mypod', containers: [
       git_commit=readFile('GIT_COMMIT')
       short_commit=git_commit.take(7)
 
-      container('docker'){
+      container('maven'){
         sh "mvn -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
     // Let's build the application inside a Docker container
     //docker.image('kmadel/maven:3.3.3-jdk-8').inside('-v /data:/data') {
