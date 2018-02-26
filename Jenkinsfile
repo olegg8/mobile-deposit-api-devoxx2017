@@ -17,13 +17,14 @@ def label = UUID.randomUUID().toString()
     ]) {
 
     node('test') {
-      //stage('Checkout') {
-        //git 'https://github.com/AlexandrSemak/mobile-deposit-api-devoxx2017.git'
-      //}
+      stage('Checkout') {
+        git branch: 'master',
+            credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
+            url: 'ssh://git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
+      }
       stage('Package') {
         try {
           container('maven') {
-            checkout scm
             sh 'mvn -B clean install -Dmaven.test.skip=true -Dfindbugs.fork=false'
           }
         } finally {
