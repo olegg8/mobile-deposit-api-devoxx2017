@@ -27,6 +27,7 @@ podTemplate(label: 'mypod', containers: [
   // Asking for an agent with label 'docker-cloud'
   node('mypod') {
     stage('Checkout') {
+        sh "git --version"
         checkout scm
       }
     stage('Build'){
