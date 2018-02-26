@@ -27,7 +27,6 @@ def label = UUID.randomUUID().toString()
           }
         } finally {
           archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*.hpi,**/target/*.jpi'
-          findbugs(includePattern:'**/target/findbugsXml.xml')
         }
       }
     }
