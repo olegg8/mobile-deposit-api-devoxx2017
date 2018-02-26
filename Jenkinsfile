@@ -11,11 +11,11 @@
 
 def label = UUID.randomUUID().toString()
 
-  podTemplate(serviceAccount: 'jenkins', label: label, containers: [
+  podTemplate(label: 'test', containers: [
     containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
     ]) {
 
-    node(label) {
+    node('test') {
       stage('Checkout') {
         checkout scm
       }
