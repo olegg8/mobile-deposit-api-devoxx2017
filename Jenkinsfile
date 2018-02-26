@@ -22,14 +22,14 @@
         git branch: 'master',
             credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
             url: 'git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
+            sh('git rev-parse HEAD > GIT_COMMIT')
+            git_commit=readFile('GIT_COMMIT')
+            short_commit=git_commit.take(7)
           }
 
       stage('Package') {
         try {
           container('maven') {
-            sh('git rev-parse HEAD > GIT_COMMIT')
-            git_commit=readFile('GIT_COMMIT')
-            short_commit=git_commit.take(7)
             sh "mvn -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
           }
         } finally {
