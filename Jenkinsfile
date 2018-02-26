@@ -15,7 +15,7 @@ def short_commit = null
 echo "Building ${env.BRANCH_NAME}"
 
 
-podTemplate(label: mypod, containers: [
+podTemplate(label: 'mypod', containers: [
     containerTemplate(name: 'mvn', image: 'kmadel/maven:3.3.3-jdk-8', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
@@ -25,7 +25,7 @@ podTemplate(label: mypod, containers: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
   ]) {
   // Asking for an agent with label 'docker-cloud'
-  node(mypod) {
+  node('mypod') {
     stage('Checkout') {
         checkout scm
       }
