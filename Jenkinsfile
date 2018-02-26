@@ -26,10 +26,10 @@ podTemplate(label: 'mypod', containers: [
   ]) {
   // Asking for an agent with label 'docker-cloud'
   node('mypod') {
-    stage ('Build') {
-
-      checkout scm
-
+    stage('Checkout') {
+        checkout scm
+      }
+    stage('Build')
       // Let's retrieve the SHA-1 on the last commit (to identify the version we build)
       sh('git rev-parse HEAD > GIT_COMMIT')
       git_commit=readFile('GIT_COMMIT')
