@@ -20,7 +20,7 @@ def label = UUID.randomUUID().toString()
       stage('Checkout') {
         git branch: 'master',
             credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
-            url: 'ssh://git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
+            url: 'git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
       }
       stage('Package') {
         try {
