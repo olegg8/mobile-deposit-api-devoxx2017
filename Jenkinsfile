@@ -12,7 +12,10 @@
   podTemplate(label: 'test', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:latest', args: '${computer.jnlpmac} ${computer.name}'),
     containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
-    ]) {
+    ],
+    volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+  ]) {
 
     node('test') {
       stage('Checkout') {
@@ -37,6 +40,12 @@
         }
       }
 
-
+      stage('Build Docker Image') {
+      //unstash Spring Boot JAR and Dockerfile
+      dir('target') {
+        unstash 'jar-dockerfile'
+        docker.build "mobile-deposit-api:${dockerTag}"
+      }
     }
   }
+}
