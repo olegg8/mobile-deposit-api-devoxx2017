@@ -49,7 +49,7 @@ podTemplate(label: 'mypod', containers: [
   }
 }
 
-def dockerTag = "${env.BUILD_NUMBER}-${short_commit}"
+//def dockerTag = "${env.BUILD_NUMBER}-${short_commit}"
 
 //stage('Version Release') {
 
