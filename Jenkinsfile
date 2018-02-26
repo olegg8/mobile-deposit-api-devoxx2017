@@ -10,18 +10,9 @@
  */
 
 def label = UUID.randomUUID().toString()
-def jvmOptions = '-Xmx300M'
 
   podTemplate(serviceAccount: 'jenkins', label: label, containers: [
-    containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat',
-        resourceRequestCpu: '100m',
-        resourceLimitMemory: '1200Mi')
-    ], envVars: [
-        envVar(key: '_JAVA_OPTIONS', value: jvmOptions),
-        envVar(key: 'BRANCH_NAME', value: env.BRANCH_NAME),
-        envVar(key: 'BUILD_NUMBER', value: env.BUILD_NUMBER)
-    ], volumes: [
-      persistentVolumeClaim(mountPath: '/root/.m2/repository-read-only', claimName: 'maven-repo', readOnly: true)
+    containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
     ]) {
 
     node(label) {
