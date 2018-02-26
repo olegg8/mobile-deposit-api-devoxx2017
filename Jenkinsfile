@@ -9,8 +9,6 @@
  * two concurrent jobs with this pipeline. Or change readOnly: true after the first run
  */
 
-def label = UUID.randomUUID().toString()
-
   podTemplate(label: 'test', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:latest', args: '${computer.jnlpmac} ${computer.name}'),
     containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
@@ -21,15 +19,24 @@ def label = UUID.randomUUID().toString()
         git branch: 'master',
             credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
             url: 'git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
-      }
+          }
+
       stage('Package') {
         try {
           container('maven') {
-            sh 'mvn -B clean install -Dmaven.test.skip=true -Dfindbugs.fork=false'
+            sh('git rev-parse HEAD > GIT_COMMIT')
+            git_commit=readFile('GIT_COMMIT')
+            short_commit=git_commit.take(7)
+            sh "mvn -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
           }
         } finally {
-          archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*.hpi,**/target/*.jpi'
+          archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*.jar,**/target/Dockerfile'
+          stash name: 'pom', includes: 'pom.xml'
+          stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
+          stash name: 'deployment.yml', includes:'deployment.yml'
         }
       }
+
+
     }
   }
