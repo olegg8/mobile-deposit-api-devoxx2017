@@ -12,8 +12,6 @@
 def label = UUID.randomUUID().toString()
 def jvmOptions = '-Xmx300M'
 
-timestamps {
-
   podTemplate(serviceAccount: 'jenkins', label: label, containers: [
     containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat',
         resourceRequestCpu: '100m',
@@ -43,5 +41,3 @@ timestamps {
       }
     }
   }
-
-}
