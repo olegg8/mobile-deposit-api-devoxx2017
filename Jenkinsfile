@@ -17,12 +17,13 @@ def label = UUID.randomUUID().toString()
     ]) {
 
     node('test') {
-      stage('Checkout') {
-        git 'https://github.com/AlexandrSemak/mobile-deposit-api-devoxx2017.git'
-      }
+      //stage('Checkout') {
+        //git 'https://github.com/AlexandrSemak/mobile-deposit-api-devoxx2017.git'
+      //}
       stage('Package') {
         try {
           container('maven') {
+            checkout scm
             sh 'mvn -B clean install -Dmaven.test.skip=true -Dfindbugs.fork=false'
           }
         } finally {
