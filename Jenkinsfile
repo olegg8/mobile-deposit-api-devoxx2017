@@ -16,6 +16,7 @@ echo "Building ${env.BRANCH_NAME}"
 
 
 podTemplate(label: 'mypod', containers: [
+    containerTemplate(name: 'mvn', image: 'kmadel/maven:3.3.3-jdk-8', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
     containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm:latest', command: 'cat', ttyEnabled: true)
@@ -26,17 +27,19 @@ podTemplate(label: 'mypod', containers: [
   // Asking for an agent with label 'docker-cloud'
   node('mypod') {
     stage ('Build') {
+
+      checkout scm
+
+      // Let's retrieve the SHA-1 on the last commit (to identify the version we build)
+      sh('git rev-parse HEAD > GIT_COMMIT')
+      git_commit=readFile('GIT_COMMIT')
+      short_commit=git_commit.take(7)
+
       container('docker'){
-    checkout scm
-
-    // Let's retrieve the SHA-1 on the last commit (to identify the version we build)
-    sh('git rev-parse HEAD > GIT_COMMIT')
-    git_commit=readFile('GIT_COMMIT')
-    short_commit=git_commit.take(7)
-
-    // Let's build the application inside a Docker container
-    docker.image('kmadel/maven:3.3.3-jdk-8').inside('-v /data:/data') {
         sh "mvn -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
+    // Let's build the application inside a Docker container
+    //docker.image('kmadel/maven:3.3.3-jdk-8').inside('-v /data:/data') {
+      //  sh "mvn -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
     }
 
     // Let's stash various files, mandatory of the pipeline
@@ -48,28 +51,28 @@ podTemplate(label: 'mypod', containers: [
 
 def dockerTag = "${env.BUILD_NUMBER}-${short_commit}"
 
-stage('Version Release') {
+//stage('Version Release') {
 
-  container('docker'){
+  //container('docker'){
 
     // Extract the version number from the pom.xml file
-    unstash 'pom'
-    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-    if (matcher) {
-        buildVersion = matcher[0][1]
-        echo "Release version: ${buildVersion}"
-    }
-    matcher = null
+    //unstash 'pom'
+    //def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+    //if (matcher) {
+      //  buildVersion = matcher[0][1]
+        //echo "Release version: ${buildVersion}"
+    //}
+    //matcher = null
 
-    def mobileDepositApiImage
-    stage('Build Docker Image') {
+    //def mobileDepositApiImage
+    //stage('Build Docker Image') {
       //unstash Spring Boot JAR and Dockerfile
-      dir('target') {
-        unstash 'jar-dockerfile'
-        mobileDepositApiImage = docker.build "mobile-deposit-api:${dockerTag}"
-      }
-    }
-  }
-}
-}
+      //dir('target') {
+        //unstash 'jar-dockerfile'
+        //mobileDepositApiImage = docker.build "mobile-deposit-api:${dockerTag}"
+      //}
+    //}
+  //}
+//}
+//}
 }
