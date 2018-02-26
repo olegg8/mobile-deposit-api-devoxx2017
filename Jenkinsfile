@@ -33,7 +33,7 @@
             sh "mvn -DGIT_COMMIT='${short_commit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
           }
         } finally {
-          archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*.jar,**/target/Dockerfile'
+          //archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*.jar,**/target/Dockerfile'
           stash name: 'pom', includes: 'pom.xml'
           stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
           stash name: 'deployment.yml', includes:'deployment.yml'
