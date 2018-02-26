@@ -27,7 +27,9 @@ podTemplate(label: 'mypod', containers: [
 
   node('mypod') {
     stage('Checkout') {
+        sh 'git --version'
         checkout scm
+        sh 'git --version'
       }
     stage('Build'){
       // Let's retrieve the SHA-1 on the last commit (to identify the version we build)
