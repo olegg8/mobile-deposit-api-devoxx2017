@@ -38,7 +38,7 @@
           stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
           stash name: 'deployment.yml', includes:'deployment.yml'
           stage('Build'){
-            unstash 'jar-dockerfile'
+            //unstash 'jar-dockerfile'
             docker.build "mobile-deposit-api:${dockerTag}"
           }
         }
