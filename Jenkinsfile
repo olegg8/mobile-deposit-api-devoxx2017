@@ -17,6 +17,8 @@
       def gitBranch = myRepo.GIT_BRANCH
       def shortGitCommit = "${gitCommit[0..10]}"
       def previousGitCommit = sh(script: "git rev-parse ${gitCommit}~", returnStdout: true)
+
+      stash name: 'sgc', includes: 'shortGitCommit'
       }
       //stage('Checkout') {
         //git branch: 'master',
@@ -29,6 +31,7 @@
 
       stage('Package') {
           container('maven') {
+            unstash 'sgc'
             sh "mvn -DGIT_COMMIT='${shortGitCommit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
             stash name: 'pom', includes: 'pom.xml'
             stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
