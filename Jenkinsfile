@@ -8,10 +8,10 @@
 
     node('test') {
 
-      git branch: 'master',
+      def myRepo = git branch: 'master',
           credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
           url: 'git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
-      def myRepo = checkout scm
+      //def myRepo = checkout scm
       def gitCommit = myRepo.GIT_COMMIT
       def gitBranch = myRepo.GIT_BRANCH
       def shortGitCommit = "${gitCommit[0..10]}"
