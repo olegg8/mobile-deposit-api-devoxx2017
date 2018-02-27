@@ -1,14 +1,3 @@
-/**
- * Build and test the kubernetes plugin using the plugin itself in a Kubernetes cluster
- *
- * A `jenkins` service account needs to be created using src/main/kubernetes/service-account.yml
- *
- * A PersistentVolumeClaim needs to be created ahead of time with the definition in examples/maven-with-cache-pvc.yml
- *
- * NOTE that typically writable volumes can only be attached to one Pod at a time, so you can't execute
- * two concurrent jobs with this pipeline. Or change readOnly: true after the first run
- */
-
   podTemplate(label: 'test', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:latest', args: '${computer.jnlpmac} ${computer.name}'),
     containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
@@ -19,7 +8,10 @@
 
     node('test') {
 
-      def myRepo = checkout scm
+      git branch: 'master',
+          credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
+          url: 'git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
+      //def myRepo = checkout scm
       def gitCommit = myRepo.GIT_COMMIT
       def gitBranch = myRepo.GIT_BRANCH
       def shortGitCommit = "${gitCommit[0..10]}"
@@ -47,12 +39,12 @@
         }
       }
 
-      stage('Build Docker Image') {
+      //stage('Build Docker Image') {
       //unstash Spring Boot JAR and Dockerfile
-      dir('target') {
-        unstash 'jar-dockerfile'
-        docker.build "mobile-deposit-api:${dockerTag}"
-      }
-    }
+      //dir('target') {
+        //unstash 'jar-dockerfile'
+        //docker.build "mobile-deposit-api:${dockerTag}"
+      //}
+    //}
   }
 }
