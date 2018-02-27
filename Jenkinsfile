@@ -31,12 +31,12 @@
       stage('Package') {
           container('maven') {
             sh "mvn -DGIT_COMMIT='${shortGitCommit}' -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_URL=${env.BUILD_URL} clean package"
-            //stash name: 'pom', includes: 'pom.xml'
-            //stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
-            //stash name: 'deployment.yml', includes:'deployment.yml'
+            stash name: 'pom', includes: 'pom.xml'
+            stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
+            stash name: 'deployment.yml', includes:'deployment.yml'
           }
       stage('Build'){
-        //unstash 'jar-dockerfile'
+        unstash 'jar-dockerfile'
         docker.build "mobile-deposit-api:${dockerTag}"
           }
         }
