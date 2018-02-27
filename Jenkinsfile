@@ -19,15 +19,10 @@
       def shortGitCommit = "${gitCommit[0..10]}"
       def dockerTag = "${env.BUILD_NUMBER}-${shortGitCommit}"
       def previousGitCommit = sh(script: "git rev-parse ${gitCommit}~", returnStdout: true)
-      //}
-      //stage('Checkout') {
-        //git branch: 'master',
-          //  credentialsId: '3d11bf3a-974e-46e9-9bf9-872734a65798',
-            //url: 'git@github.com:AlexandrSemak/mobile-deposit-api-devoxx2017.git'
+
             //sh('git rev-parse HEAD > GIT_COMMIT')
             //git_commit=readFile('GIT_COMMIT')
             //short_commit=git_commit.take(7)
-          //}
 
       stage('Package') {
           container('maven') {
@@ -37,19 +32,16 @@
             stash name: 'deployment.yml', includes:'deployment.yml'
           }
       }
+
+      unstash 'jar-dockerfile'
+
       stage('Build'){
-        container('docker'){
-        unstash 'jar-dockerfile'
-        dir('target') {
-          docker.build "mobile-deposit-api:${dockerTag}"
+          container('docker'){
+          //unstash 'jar-dockerfile'
+          dir('target') {
+            docker.build "mobile-deposit-api:${dockerTag}"
           }
         }
       }
-      //stage('Build Docker Image') {
-      //unstash Spring Boot JAR and Dockerfile
-    //  container('maven') {
-      //    unstash 'jar-dockerfile'
-        //  docker.build "mobile-deposit-api:${dockerTag}"
-      //}
   }
-}  
+}
