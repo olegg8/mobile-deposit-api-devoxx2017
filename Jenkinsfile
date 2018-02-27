@@ -37,10 +37,12 @@
           }
       stage('Build'){
         unstash 'jar-dockerfile'
-        docker.build "mobile-deposit-api:${dockerTag}"
+        dir('target') {
+          docker.build "mobile-deposit-api:${dockerTag}"
           }
         }
       }
+    }
 
       //stage('Build Docker Image') {
       //unstash Spring Boot JAR and Dockerfile
