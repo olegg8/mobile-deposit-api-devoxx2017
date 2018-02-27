@@ -39,7 +39,7 @@
         //unstash 'jar-dockerfile'
         //dir('target') {
           //docker.build "mobile-deposit-api:${dockerTag}"
-          /}
+          }
         //}
        //}
       }
