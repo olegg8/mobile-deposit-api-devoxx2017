@@ -34,13 +34,14 @@
             stash name: 'pom', includes: 'pom.xml'
             stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
             stash name: 'deployment.yml', includes:'deployment.yml'
-      stage('Build'){
-        unstash 'jar-dockerfile'
-        dir('target') {
-          docker.build "mobile-deposit-api:${dockerTag}"
-          }
-        }
-       }
+            docker.build "mobile-deposit-api:${dockerTag}"
+      //stage('Build'){
+        //unstash 'jar-dockerfile'
+        //dir('target') {
+          //docker.build "mobile-deposit-api:${dockerTag}"
+          /}
+        //}
+       //}
       }
     }
 
