@@ -38,7 +38,7 @@
           }
       }
       stage('Build'){
-        container('docker')
+        container('docker'){
         unstash 'jar-dockerfile'
         dir('target') {
           docker.build "mobile-deposit-api:${dockerTag}"
@@ -52,3 +52,4 @@
         //  docker.build "mobile-deposit-api:${dockerTag}"
       //}
   }
+}  
