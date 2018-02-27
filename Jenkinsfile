@@ -39,12 +39,14 @@
         }
       }
 
-      //stage('Build Docker Image') {
+      stage('Build Docker Image') {
       //unstash Spring Boot JAR and Dockerfile
-      //dir('target') {
-        //unstash 'jar-dockerfile'
-        //docker.build "mobile-deposit-api:${dockerTag}"
-      //}
-    //}
+      container('maven') {
+        dir('target') {
+          unstash 'jar-dockerfile'
+          docker.build "mobile-deposit-api:${dockerTag}"
+        }
+      }
+    }
   }
 }
