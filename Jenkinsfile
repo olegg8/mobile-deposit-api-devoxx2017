@@ -1,6 +1,7 @@
   podTemplate(label: 'test', containers: [
     containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:latest', args: '${computer.jnlpmac} ${computer.name}'),
-    containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat')
+    containerTemplate(name: 'maven', image: 'maven:3.5.0-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
     ],
     volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
@@ -34,17 +35,16 @@
             stash name: 'pom', includes: 'pom.xml'
             stash name: 'jar-dockerfile', includes: '**/target/*.jar,**/target/Dockerfile'
             stash name: 'deployment.yml', includes:'deployment.yml'
-            docker.build "mobile-deposit-api:${dockerTag}"
-      //stage('Build'){
-        //unstash 'jar-dockerfile'
-        //dir('target') {
-          //docker.build "mobile-deposit-api:${dockerTag}"
           }
-        //}
-       //}
       }
-    }
-
+      stage('Build'){
+        container('docker')
+        unstash 'jar-dockerfile'
+        dir('target') {
+          docker.build "mobile-deposit-api:${dockerTag}"
+          }
+        }
+      }
       //stage('Build Docker Image') {
       //unstash Spring Boot JAR and Dockerfile
     //  container('maven') {
